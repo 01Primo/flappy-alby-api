@@ -14,9 +14,19 @@ namespace FlappyAlby.API.Repository
             _writer = writer;
         }
 
-        public Task<PlayerDto> Create(PlayerDto player)
+        public async Task<PlayerDto> Create(PlayerDto player)
         {
-            throw new NotImplementedException();
+            const string query = @"INSERT INTO Player
+                                ([Name] ,[Total])
+                                VALUES (@Name, @Total)";
+            var newPlayer = new Player(default, player.Name, player.Total);
+            var newId = await _writer.WriteAsync(query, newPlayer);            
+            return new PlayerDto 
+            { 
+                Id = newPlayer.Id, 
+                Name = newPlayer.Name,
+                Total = newPlayer.Total
+            };
         }
 
         public async Task<IEnumerable<PlayerDto>> GetTopTen()

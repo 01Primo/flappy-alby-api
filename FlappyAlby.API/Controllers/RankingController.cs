@@ -27,8 +27,21 @@ public class RankingController : ControllerBase
     }
     
     [HttpPost]
-    public IActionResult Post([FromBody] PlayerDto player)
+    public async Task<IActionResult> Post([FromBody] PlayerDto player)
     {
-        return Ok();
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+        try
+        {
+            var created = await _playerRepository.Create(player);
+
+            return Ok(created);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 }
