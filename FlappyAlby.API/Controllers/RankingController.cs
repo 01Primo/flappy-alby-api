@@ -4,26 +4,25 @@ namespace FlappyAlby.API.Controllers;
 
 using Bogus;
 using DTOs;
+using Abstract;
 
 [ApiController]
 [Route("[controller]")]
 public class RankingController : ControllerBase
 {
    private readonly ILogger<RankingController> _logger;
+    private readonly IPlayerRepository _playerRepository;
 
-    public RankingController(ILogger<RankingController> logger)
+    public RankingController(ILogger<RankingController> logger, IPlayerRepository playerRepository)
     {
         _logger = logger;
+        _playerRepository = playerRepository;
     }
 
     [HttpGet]
-    public IActionResult Get()
+    public async Task<IActionResult> Get()
     {
-        var faker = new Faker();
-        var result = Enumerable.Range(1, 5)
-            .Select((index, index1) => new PlayerDto(faker.Name.FirstName(), faker.Date.Timespan(TimeSpan.FromMinutes(5)), index + index1))
-            .OrderBy(player => player.Total);
-
+        var result = await _playerRepository.GetTopTen();
         return Ok(result);
     }
     

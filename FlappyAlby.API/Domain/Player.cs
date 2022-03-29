@@ -1,3 +1,3 @@
 ﻿namespace FlappyAlby.API.Domain;
 
-public record Player(string Name, TimeSpan Total, int? Id = default) : EntityBase(Id);
+public record Player(int? Id = default, string Name = "", TimeSpan Total = default ) : EntityBase(Id);

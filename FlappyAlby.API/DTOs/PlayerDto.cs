@@ -1,3 +1,14 @@
-﻿namespace FlappyAlby.API.DTOs;
+﻿using System.ComponentModel.DataAnnotations;
 
-public record PlayerDto (string Name, TimeSpan Total, int? Id = default);
+namespace FlappyAlby.API.DTOs;
+
+public class PlayerDto
+{
+    [Required, StringLength(10)]
+    public string Name { get; init; } = string.Empty;
+
+    [Required]
+    public TimeSpan Total { get; init; } = default;
+
+    public int? Id { get; init; }
+}
