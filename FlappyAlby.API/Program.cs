@@ -1,8 +1,8 @@
 using FlappyAlby.API.Abstract;
+using FlappyAlby.API.Data;
 using FlappyAlby.API.Options;
-using FlappyAlby.API.Readers;
 using FlappyAlby.API.Repositories;
-using FlappyAlby.API.Writers;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,9 +18,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors();
 
-builder.Services.AddSingleton<IRankingRepository, RankingRepository>();
-builder.Services.AddSingleton<IReader, SqlReader>();
-builder.Services.AddSingleton<IWriter, SqlWriter>();
+builder.Services.AddScoped<IRankingRepository, RankingRepository>();
+
+builder.Services.AddDbContext<FlappyDbContext>(
+    options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultDatabase")));
 
 var app = builder.Build();
 

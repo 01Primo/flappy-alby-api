@@ -1,37 +1,31 @@
 ﻿namespace FlappyAlby.API.Repositories;
 
 using Abstract;
+using Data;
 using Domain;
 using DTOs;
+using Microsoft.EntityFrameworkCore;
 
 public class RankingRepository : IRankingRepository
 {
-    private readonly IReader _reader;
-    private readonly IWriter _writer;
+    private readonly FlappyDbContext _context;
 
-    public RankingRepository(IReader reader, IWriter writer)
+    public RankingRepository(FlappyDbContext context)
     {
-        _reader = reader;
-        _writer = writer;
+        _context = context;
     }
 
     public async Task<IEnumerable<PlayerDto>> GetTop10()
     {
-        const string query = @"SELECT TOP 10 Name, Total as TotalMilliseconds, Id
-                              FROM Player
-                              ORDER BY Total ASC";
-
-        var players = await _reader.QueryAsync<Player>(query);
+        var players = await _context.Players.OrderBy(p => p.TotalMilliseconds).Take(10).ToListAsync();
+        
         return players.Select(p => new PlayerDto(p.Name, TimeSpan.FromMilliseconds(p.TotalMilliseconds), p.Id));
     }
 
     public async Task<PlayerDto?> GetById(int id)
     {
-        const string query = @"SELECT Name, Total as TotalMilliseconds, Id
-                             FROM Player
-                             WHERE Id=@Id";
-
-        var player = await _reader.GetByIdAsync<Player>(query, id);
+        var player = await _context.Players.FindAsync(id);
+        
         if (player is null) return null;
         var playerDto = new PlayerDto(
             player.Name,
@@ -43,12 +37,11 @@ public class RankingRepository : IRankingRepository
 
     public async Task<bool> Create(PlayerDto player)
     {
-        const string query = @"INSERT INTO Player(Name, Total)
-                             OUTPUT inserted.Id
-                             VALUES (@Name, @TotalMilliseconds)";
-
-        var playerEntity = new Player(player.Name, (long) player.Total.TotalMilliseconds, player.Id);
-        _ = await _writer.CreateAsync(query, playerEntity);
+        var entity = new Player(player.Name, (long) player.Total.TotalMilliseconds, player.Id);
+        
+        await _context.AddAsync(entity);
+        await _context.SaveChangesAsync();
+        
         return true;
     }
 }

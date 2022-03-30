@@ -37,7 +37,7 @@ import {RankingService} from "./services/rankingService.js";
         const statisticsService = new StatisticsService(area.coordinate, html_speed, html_percentage);
         const overlayService = new OverlayService(html_overlay, html_overlay_title, html_overlay_score, html_overlay_leaderboard, html_start_button);
         const levelService = new LevelService(html_level, levelsOptions);
-        const livesService = new LivesService(html_lives);
+        const livesService = new LivesService(html_lives, 3);
         const httpService = new HttpService();
         const rankingService = new RankingService(html_ranking, httpService, 'https://localhost:7126/ranking');
 
