@@ -33,10 +33,8 @@
     }
 
     reload(player, stopwatch) {
-        this.#percentage = stopwatch.current / stopwatch.final * 100;
+        this.#percentage = stopwatch.percentage;
         
-        console.log(`current: ${stopwatch.current} final ${stopwatch.final} Percentage: ${this.#percentage}`);
-
         if (player.left < Math.floor(this.#areaCoordinate.width / 3)) {
             this.#speed = 1;
         } else if (player.left < Math.floor(this.#areaCoordinate.width / 3) * 2) {

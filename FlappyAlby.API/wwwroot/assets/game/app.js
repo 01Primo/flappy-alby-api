@@ -39,7 +39,7 @@ import {RankingService} from "./services/rankingService.js";
         const levelService = new LevelService(html_level, levelsOptions);
         const livesService = new LivesService(html_lives);
         const httpService = new HttpService();
-        const rankingService = new RankingService(html_ranking, httpService, 'http://localhost:7126/ranking');
+        const rankingService = new RankingService(html_ranking, httpService, 'https://localhost:7126/ranking');
 
         const game = new Game(area, statisticsService, overlayService, levelService, livesService, rankingService);
         html_start_button.onclick = () => game.nextLevel(html_player_name_input.value)();

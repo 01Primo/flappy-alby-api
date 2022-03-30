@@ -33,9 +33,6 @@
     #animate = (timestamp, playerCoordinate, steps = 1) => {
         
         this.#lastTimestamp = this.#lastTimestamp ?? timestamp;
-
-        console.log(`TimeSTAMP ${timestamp}`);
-        console.log(`LastTimeStep ${this.#lastTimestamp}`);
         
         let timestep = timestamp - this.#lastTimestamp;
         this.#lastTimestamp = timestamp;

@@ -1,15 +1,20 @@
 ﻿export class Stopwatch {
     #start = 0;
     #final = 10000;
+    #bonus = 0;
 
     #total = 0;
 
     get current() {
-        return new Date(Date.now() - this.#start);
+        return Date.now() - this.#start + this.#bonus;
     }
 
     get final() {
-        return new Date(this.#final);
+        return new Date(this.#final - this.#bonus);
+    }
+
+    get percentage() {
+        return this.current / this.#final * 100;
     }
 
     get total() {
@@ -28,14 +33,14 @@
     start(final) {
         this.#start = Date.now();
         this.#final = final;
+        this.#bonus = 0;
     }
 
     stop() {
-        this.#total += this.#final;
+        this.#total += this.#final - this.#bonus;
     }
 
     applyBonus(value, timestep) {
-        console.log(`STOPWATCH: ${timestep}: ${value}`);
-        this.#final -= value * timestep;
+        this.#bonus += value * timestep;
     }
 }
