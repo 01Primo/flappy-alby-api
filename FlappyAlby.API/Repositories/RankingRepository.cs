@@ -15,29 +15,28 @@ public class RankingRepository : IRankingRepository
         _context = context;
     }
 
-    public async Task<IEnumerable<PlayerDto>> GetTop10()
+    public async Task<IEnumerable<RankingDto>> GetTop10()
     {
-        var players = await _context.Players.OrderBy(p => p.TotalMilliseconds).Take(10).ToListAsync();
+        var rank = await _context.Ranking
+            .Include(r => r.Player)
+            .OrderBy(r => r.Total).Take(10)
+            .ToListAsync();
         
-        return players.Select(p => new PlayerDto(p.Name, TimeSpan.FromMilliseconds(p.TotalMilliseconds), p.Id));
+        return rank.Select(r => new RankingDto(r.Player!.Name, r.Total));
     }
 
-    public async Task<PlayerDto?> GetById(int id)
+    public async Task<bool> Create(RankingDto ranking)
     {
-        var player = await _context.Players.FindAsync(id);
-        
-        if (player is null) return null;
-        var playerDto = new PlayerDto(
-            player.Name,
-            TimeSpan.FromMilliseconds(player.TotalMilliseconds),
-            player.Id
-        );
-        return playerDto;
-    }
+        var player = await _context.Players.SingleOrDefaultAsync(p => p.Name == ranking.PlayerName);
 
-    public async Task<bool> Create(PlayerDto player)
-    {
-        var entity = new Player(player.Name, (long) player.Total.TotalMilliseconds, player.Id);
+        if (player is null)
+        {
+            var added = await _context.Players.AddAsync(new Player(ranking.PlayerName));
+            player = added.Entity;
+            await _context.SaveChangesAsync();
+        }
+
+        var entity = new Ranking((int) player.Id!, ranking.Total);
         
         await _context.AddAsync(entity);
         await _context.SaveChangesAsync();

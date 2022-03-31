@@ -32,11 +32,11 @@ public class RankingController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post([FromBody] PlayerDto player)
+    public async Task<IActionResult> Post([FromBody] RankingDto ranking)
     {
         try
         {
-            _ = await _rankingRepository.Create(player);
+            _ = await _rankingRepository.Create(ranking);
             return Ok();
         }
         catch (Exception e)

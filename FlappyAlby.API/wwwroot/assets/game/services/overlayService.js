@@ -56,8 +56,8 @@
         this.#htmlLeaderboard.style.display = 'block';
 
         let html = '<ol>';
-        for (const player of JSON.parse(response)) {
-            html += `<li>${player.name} - ${player.total}</li>`;
+        for (const rank of JSON.parse(response)) {
+            html += `<li>${rank.playerName} - ${rank.total}</li>`;
         }
         html += '</ol>';
 

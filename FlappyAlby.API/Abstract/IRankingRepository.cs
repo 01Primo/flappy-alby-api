@@ -4,7 +4,6 @@ using DTOs;
 
 public interface IRankingRepository
 {
-    Task<IEnumerable<PlayerDto>> GetTop10();
-    Task<PlayerDto?> GetById(int id);
-    Task<bool> Create(PlayerDto player);
+    Task<IEnumerable<RankingDto>> GetTop10();
+    Task<bool> Create(RankingDto player);
 }

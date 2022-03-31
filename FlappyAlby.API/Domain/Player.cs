@@ -1,3 +1,8 @@
 ﻿namespace FlappyAlby.API.Domain;
 
-public record Player(string Name, long TotalMilliseconds, int? Id = default) : EntityBase(Id);
+using System.ComponentModel.DataAnnotations;
+
+public record Player(string Name, int? Id = default) : EntityBase(Id)
+{
+    public IReadOnlyCollection<Ranking> Rankings { get; } = new HashSet<Ranking>();
+}
