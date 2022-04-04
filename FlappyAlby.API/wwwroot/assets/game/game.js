@@ -5,35 +5,46 @@ import {Stopwatch} from "./core/stopwatch.js";
 
 export class Game {
     #area;
-    #player;
-    #ai;
-
-    #statisticsService;
     #overlayService;
+    
+    #percentageService;
+    #speedService
     #levelService;
     #livesService;
-    #rankingService;
-
+    
+    #rankingClient;
+    
+    #player;
+    #ai;
     #stopwatch;
+    
+    #gameOver = false;
 
-    #playerName;
-
-    constructor(area, statisticsService, overlayService, levelService, livesService, rankingService) {
+    constructor(area, overlayService, levelService, percentageService, speedService, livesService, rankingClient) {
         this.#area = area;
-
-        this.#statisticsService = statisticsService;
         this.#overlayService = overlayService;
+        
         this.#levelService = levelService;
+        this.#percentageService = percentageService;
+        this.#speedService = speedService;
         this.#livesService = livesService;
-        this.#rankingService = rankingService;
+        
+        this.#rankingClient = rankingClient;
     }
 
-    nextLevel(playerName) {
+    async nextLevel() {
+        if (this.#gameOver)
+        {
+            this.#gameOver = false;
+            const leaders = await this.#rankingClient.send(this.#overlayService.getName, this.#stopwatch.total);
+            this.#overlayService.congratulations(leaders);
+            this.#levelService.reset();
+            return;
+        }
+        
         if (this.#levelService.first && !this.#livesService.alive) {
             this.#livesService.recover();
-            this.#rankingService.hide();
             this.#stopwatch = new Stopwatch();
-            this.#playerName = playerName;
         }
 
         const options = this.#levelService.currentOptions;
@@ -43,35 +54,38 @@ export class Game {
         this.#ai = new Ai(this.#area, schema, this.#onStepOver);
 
         return () => {
-            this.#overlayService.hide();
+            this.#overlayService.startGame();
+
             this.#levelService.update();
+            this.#percentageService.start();
+            this.#speedService.start();
             this.#livesService.update();
 
-            this.#statisticsService.start();
             this.#stopwatch.start(options.finalTime);
             this.#ai.start(this.#player.coordinate, options.steps);
         }
     }
 
-    #onStepOver = (timestep) => {
-        this.#statisticsService.reload(this.#player.coordinate, this.#stopwatch);
-        this.#stopwatch.applyBonus(this.#statisticsService.bonus, timestep);
+    #onStepOver = async timestamp => {
+        this.#speedService.calculate(this.#player.coordinate);
+        this.#stopwatch.detect(timestamp, this.#speedService.speed);
+        this.#percentageService.calculate(this.#stopwatch);
 
-        const gameOver = this.#onGameOver();
+        const gameOver = await this.#onGameOver();
         if (gameOver) return false;
 
-        const levelOver = this.#onLevelOver();
+        const levelOver = await this.#onLevelOver();
         return !levelOver;
     }
 
     #stop() {
-        this.#stopwatch.stop();
         this.#ai.stop();
 
         this.#player.dispose();
         this.#player = undefined;
 
-        this.#statisticsService.stop();
+        this.#speedService.stop();
+        this.#percentageService.stop();
     }
 
     // look at collisions and kill player, consumes lives
@@ -89,12 +103,13 @@ export class Game {
             const alive = this.#livesService.alive;
             if (alive) {
                 // USE REMAINING LIVES (CONTINUE) => players.count > 0
+                this.#stopwatch.lap();
                 this.#overlayService.continue(this.#stopwatch);
             } else {
                 // Game Over (you LOOSE)  =>  players.count <= 0
-                this.#overlayService.gameOver(this.#stopwatch);
+                this.#stopwatch.stop();
+                this.#overlayService.youLose(this.#stopwatch, async () => await this.#rankingClient.get());
                 this.#levelService.reset();
-                this.#rankingService.show(this.#overlayService.displayLeaderboard);
             }
         }
 
@@ -102,7 +117,7 @@ export class Game {
     }
 
     // lock at score complete and kill player without consume lives
-    #onLevelOver() {
+    async #onLevelOver() {
         // LEVEL Status Table               | levelOver | final |
         // Next level  (NEXT Level)         | 1         | 0     |
         // Game Over   (you WIN)            | 1         | 1     |
@@ -113,14 +128,13 @@ export class Game {
             const final = this.#levelService.final;
             if (final) {
                 // FINAL LEVEL COMPLETE, YOU WIN (you WIN) => levelIndex > totalLevels
+                this.#stopwatch.stop();
                 this.#overlayService.youWin(this.#stopwatch);
-                this.#levelService.reset();
                 this.#livesService.kill();
-                this.#rankingService.sendScore(this.#playerName, this.#stopwatch, () => {
-                    this.#rankingService.show(this.#overlayService.displayLeaderboard);
-                });
+                this.#gameOver = true;
             } else {
                 // SOME REMAINING LEVELS (NEXT Level) => levelIndex <= totalLevels
+                this.#stopwatch.lap();
                 this.#overlayService.levelOver(this.#stopwatch, this.#levelService.level);
                 this.#levelService.increase();
             }

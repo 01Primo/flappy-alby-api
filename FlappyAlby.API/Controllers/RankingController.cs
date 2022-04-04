@@ -37,7 +37,9 @@ public class RankingController : ControllerBase
         try
         {
             _ = await _rankingRepository.Create(ranking);
-            return Ok();
+            var result = await _rankingRepository.GetTop10();
+
+            return Ok(result);
         }
         catch (Exception e)
         {

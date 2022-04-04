@@ -1,26 +1,25 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace FlappyAlby.API.Migrations
 {
-    public partial class SecondMigration : Migration
+    public partial class FirstMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "TotalMilliseconds",
-                table: "Players");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "Name",
-                table: "Players",
-                type: "nvarchar(20)",
-                maxLength: 20,
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
+            migrationBuilder.CreateTable(
+                name: "Players",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Players", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Ranking",
@@ -29,7 +28,7 @@ namespace FlappyAlby.API.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     PlayerId = table.Column<int>(type: "int", nullable: false),
-                    Total = table.Column<TimeSpan>(type: "time", nullable: false)
+                    Total = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -58,25 +57,8 @@ namespace FlappyAlby.API.Migrations
             migrationBuilder.DropTable(
                 name: "Ranking");
 
-            migrationBuilder.DropIndex(
-                name: "IX_Players_Name",
-                table: "Players");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "Name",
-                table: "Players",
-                type: "nvarchar(max)",
-                nullable: false,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(20)",
-                oldMaxLength: 20);
-
-            migrationBuilder.AddColumn<long>(
-                name: "TotalMilliseconds",
-                table: "Players",
-                type: "bigint",
-                nullable: false,
-                defaultValue: 0L);
+            migrationBuilder.DropTable(
+                name: "Players");
         }
     }
 }

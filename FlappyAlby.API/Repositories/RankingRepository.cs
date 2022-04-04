@@ -19,7 +19,7 @@ public class RankingRepository : IRankingRepository
     {
         var rank = await _context.Ranking
             .Include(r => r.Player)
-            .OrderBy(r => r.Total).Take(10)
+            .OrderBy(r => r.Total).Take(5)
             .ToListAsync();
         
         return rank.Select(r => new RankingDto(r.Player!.Name, r.Total));
@@ -27,16 +27,18 @@ public class RankingRepository : IRankingRepository
 
     public async Task<bool> Create(RankingDto ranking)
     {
-        var player = await _context.Players.SingleOrDefaultAsync(p => p.Name == ranking.PlayerName);
+        var player = await _context.Players.SingleOrDefaultAsync(p => p.Name == ranking.Name);
 
         if (player is null)
         {
-            var added = await _context.Players.AddAsync(new Player(ranking.PlayerName));
+            var added = await _context.Players.AddAsync(new Player(ranking.Name));
             player = added.Entity;
             await _context.SaveChangesAsync();
         }
 
         var entity = new Ranking((int) player.Id!, ranking.Total);
+
+        _context.Update(entity);
         
         await _context.AddAsync(entity);
         await _context.SaveChangesAsync();

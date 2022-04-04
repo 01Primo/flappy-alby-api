@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FlappyAlby.API.Migrations
 {
     [DbContext(typeof(FlappyDbContext))]
-    [Migration("20220331084042_SecondMigration")]
-    partial class SecondMigration
+    [Migration("20220404221125_FirstMigration")]
+    partial class FirstMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -56,8 +56,8 @@ namespace FlappyAlby.API.Migrations
                     b.Property<int>("PlayerId")
                         .HasColumnType("int");
 
-                    b.Property<TimeSpan>("Total")
-                        .HasColumnType("time");
+                    b.Property<int>("Total")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

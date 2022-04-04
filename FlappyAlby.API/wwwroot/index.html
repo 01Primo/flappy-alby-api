@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+<head>    
     <title>Flappy Alby</title>
+    <meta charset="UTF-8">
 
     <link href="assets/favicon.png" rel="shortcut icon" type="image/jpg"/>
-    <link href="assets/style/app.css" rel="stylesheet" type="text/css">
+
     <link href="assets/style/site.css" rel="stylesheet" type="text/css">
+    <link href="assets/style/game.css" rel="stylesheet" type="text/css">
+    <link href="assets/style/overlay.css" rel="stylesheet" type="text/css">
 
     <script src="assets/game/app.js" type="module"></script>
 </head>
@@ -16,25 +18,36 @@
     <div id="game">
         <div id="header">
             <div id="header-title">Flappy Alby</div>
-            <div id="header-player"><input id="player-name-input" type="text" placeholder="Insert name" /></div>
-            <div id="header-level">Start Game</div>
         </div>
         <div id="area">
+            
+            <!-- OVERLAY -->
             <div id="overlay">
                 <div id="overlay-title">Start Game!</div>
-                <div id="overlay-score"><span></span></div>
-                <div id="overlay-leaderboard"></div>
-                <div id="overlay-buttons">
-                    <button id="overlay-button" type="button">Start</button>
+                
+                <div class="overlay-content">
+                    <div id="overlay-leaderboard"></div>
+                    <div id="overlay-score"></div>
+                    <div id="overlay-player">
+                        <label id="overlay-player-label" for="overlay-player-input">Enter Your Nickname:</label>
+                        <input id="overlay-player-input" maxlength="15" placeholder="Nickname" type="text"/>
+                    </div>
                 </div>
-            </div>
-            <div id="percentage"></div>
-            <div id="lives"></div>
-            <div id="speed"></div>
-        </div>
-    </div>
-    <div id="ranking">
 
+                <div><button id="overlay-button" type="button">Start</button></div>
+            </div>
+            <!-- END OVERLAY -->
+
+            <div id="game-header" class="row">
+                <div class="row-left" id="level">Start Game</div>
+                <div class="row-right" id="percentage"></div>
+            </div>
+            
+            <div id="game-footer" class="row">
+                <div class="row-left" id="lives"></div>
+                <div class="row-right" id="speed"></div>
+            </div>
+        </div>
     </div>
 </div>
 

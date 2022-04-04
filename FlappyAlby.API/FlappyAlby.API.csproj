@@ -18,4 +18,35 @@
         <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\assets\favicon.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\Nintendo.ttf" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\game\app.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\game\core\ai.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\game\core\area.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\game\core\block.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\game\core\player.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\game\core\stopwatch.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\game\game.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\game\helpers\helpers.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\game\model\coordinate.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\game\model\options.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\game\schemas\barrierSchema.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\game\schemas\shemaBase.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\game\services\httpService.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\game\services\levelService.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\game\services\livesService.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\game\services\overlayService.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\game\services\rankingService.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\game\services\statisticsService.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\documentation\structure.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\player.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\style\app.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\style\site.css" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Migrations" />
+    </ItemGroup>
+
 </Project>

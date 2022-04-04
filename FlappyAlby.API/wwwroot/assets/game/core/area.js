@@ -6,9 +6,9 @@ export class Area {
     #html;
     #coordinate;
 
-    constructor(html, coordinate) {
+    constructor(html) {
         this.#html = html;
-        this.#coordinate = coordinate;
+        this.#coordinate =  new Coordinate(0, 0, html.clientHeight, html.clientWidth);
     }
 
     get coordinate() {

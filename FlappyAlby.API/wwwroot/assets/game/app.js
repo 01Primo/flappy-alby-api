@@ -5,43 +5,55 @@ import {Option} from "./model/options.js";
 import {Game} from "./game.js";
 import {Coordinate} from "./model/coordinate.js";
 import {LivesService} from "./services/livesService.js";
-import {StatisticsService} from "./services/statisticsService.js";
-import {HttpService} from "./services/httpService.js";
-import {RankingService} from "./services/rankingService.js";
+import {PercentageService} from "./services/percentageService.js";
+
+import {RankingClient} from "./clients/rakingClient.js";
+import {SpeedService} from "./services/speedService.js";
 
 (function () {
+    const area = document.getElementById('area');
+
+    const overlay = document.getElementById('overlay');
+    const overlay_title = document.getElementById('overlay-title');
+    const overlay_score = document.getElementById('overlay-score');
+    const overlay_leaderboard = document.getElementById('overlay-leaderboard');
+    const overlay_player = document.getElementById('overlay-player');
+    const overlay_player_input = document.getElementById('overlay-player-input');
+    const overlay_button = document.getElementById('overlay-button');
+
+    const level = document.getElementById('level');
+    const percentage = document.getElementById('percentage');
+    const speed = document.getElementById('speed');
+    const lives = document.getElementById('lives');
+    
     document.addEventListener('DOMContentLoaded', () => {
-        const html_area = document.getElementById('area');
-        const html_percentage = document.getElementById('percentage');
-        const html_overlay = document.getElementById('overlay');
-        const html_overlay_title = document.getElementById('overlay-title');
-        const html_overlay_score = document.getElementById('overlay-score');
-        const html_overlay_leaderboard = document.getElementById('overlay-leaderboard');
-        const html_start_button = document.getElementById('overlay-button');
-        const html_level = document.getElementById('header-level');
-        const html_lives = document.getElementById('lives');
-        const html_speed = document.getElementById('speed');
-        const html_ranking = document.getElementById('ranking');
-        const html_player_name_input = document.getElementById('player-name-input');
+        const coordinate = new Coordinate(0, 0, area.clientHeight, area.clientWidth);
+        const levels = buildLevels(coordinate);
 
-        const areaCoordinate = new Coordinate(0, 0, html_area.clientHeight, html_area.clientWidth);
-        const area = new Area(html_area, areaCoordinate);
+        const rankingClient = new RankingClient('https://localhost:7126/ranking');
 
-        const levelsOptions = [];
-        for (let i = 1; i < 6; i++) {
-            const playerSide = areaCoordinate.width / 20;
-            const playerCoordinate = new Coordinate((areaCoordinate.height - playerSide) / 2, areaCoordinate.width * .1, playerSide, playerSide);
-            levelsOptions.push(new Option(playerCoordinate, i / 2, i > 2 ? 8 : 5, i * 10000));
-        }
+        const levelService = new LevelService(level, levels);
+        const percentageService = new PercentageService(percentage);
+        const speedService = new SpeedService(speed, coordinate);
+        const livesService = new LivesService(lives);
 
-        const statisticsService = new StatisticsService(area.coordinate, html_speed, html_percentage);
-        const overlayService = new OverlayService(html_overlay, html_overlay_title, html_overlay_score, html_overlay_leaderboard, html_start_button);
-        const levelService = new LevelService(html_level, levelsOptions);
-        const livesService = new LivesService(html_lives, 3);
-        const httpService = new HttpService();
-        const rankingService = new RankingService(html_ranking, httpService, 'https://localhost:7126/ranking');
-
-        const game = new Game(area, statisticsService, overlayService, levelService, livesService, rankingService);
-        html_start_button.onclick = () => game.nextLevel(html_player_name_input.value)();
+        const overlayService = new OverlayService(overlay, overlay_title, overlay_score, overlay_leaderboard, overlay_player, overlay_player_input, overlay_button);
+        
+        const game = new Game(new Area(area, coordinate), overlayService, levelService, percentageService, speedService, livesService, rankingClient);
+        overlay_button.onclick = async () => {
+           const level = await game.nextLevel();
+           level?.();
+        };
     });
+    
+    function buildLevels(coordinate){
+        const levelsOptions = [];
+        for (let i = 1; i < 3; i++) {
+            const playerSide = coordinate.width / 20;
+            const playerCoordinate = new Coordinate((coordinate.height - playerSide) / 2, coordinate.width * .1, playerSide, playerSide);
+            levelsOptions.push(new Option(playerCoordinate, i / 2, i > 2 ? 8 : 5, i * 1000));
+        }
+        
+        return levelsOptions;
+    }
 })();

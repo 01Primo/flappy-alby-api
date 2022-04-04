@@ -54,8 +54,8 @@ namespace FlappyAlby.API.Migrations
                     b.Property<int>("PlayerId")
                         .HasColumnType("int");
 
-                    b.Property<TimeSpan>("Total")
-                        .HasColumnType("time");
+                    b.Property<int>("Total")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

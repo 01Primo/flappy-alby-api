@@ -1,46 +1,56 @@
 ﻿export class Stopwatch {
-    #start = 0;
     #final = 10000;
-    #bonus = 0;
-
+    #advancement = 0;
     #total = 0;
-
-    get current() {
-        return Date.now() - this.#start + this.#bonus;
-    }
-
+    
+    #start;
+    #stop;
+    
+    #previous;
+    #current;
+    
     get final() {
-        return new Date(this.#final - this.#bonus);
-    }
-
-    get percentage() {
-        return this.current / this.#final * 100;
+        return new Date(this.#stop - this.#start);
     }
 
     get total() {
-        return new Date(this.#total);
+        return this.#total;
     }
-
-    get formattedTotal() {
-        let t = this.total;
-        return `${ (t.getHours()-1).round2() }:${ t.getMinutes().round2() }:${ t.getSeconds().round2() }.${ t.getMilliseconds().round2() }`
+    
+    get percentage() {
+        return this.#advancement / this.#final;
     }
 
     get over() {
-        return this.#final - this.current < 0;
+        return (this.#final - this.#advancement) < 0;
     }
 
     start(final) {
-        this.#start = Date.now();
         this.#final = final;
-        this.#bonus = 0;
+        this.#start = new Date();
     }
 
+    lap() {
+        this.#reset();
+        this.#advancement = 0;
+    }
+    
     stop() {
-        this.#total += this.#final - this.#bonus;
+        this.#reset();
     }
-
-    applyBonus(value, timestep) {
-        this.#bonus += value * timestep;
+    
+    detect(timestamp, speed) {    
+        this.#previous = this.#current || timestamp;
+        this.#current = timestamp;
+        
+        const delta = this.#current - this.#previous;
+        this.#advancement += delta + (speed - 1) * 10;
+    }
+    
+    #reset() {
+        this.#stop = new Date();
+        this.#total += this.#stop - this.#start;
+        this.#current = undefined;
+        this.#previous = undefined;
     }
 }
