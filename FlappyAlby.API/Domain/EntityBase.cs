@@ -1,3 +1,3 @@
 ﻿namespace FlappyAlby.API.Domain;
 
-public abstract record EntityBase(int? Id);
+public abstract record EntityBase(Guid? Id);

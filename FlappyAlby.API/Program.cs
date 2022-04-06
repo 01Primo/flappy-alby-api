@@ -1,7 +1,6 @@
-using FlappyAlby.API.Abstract;
-using FlappyAlby.API.Data;
+using FlappyAlby.API.Extensions;
+using FlappyAlby.API.Infrastructure;
 using FlappyAlby.API.Options;
-using FlappyAlby.API.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,17 +12,16 @@ builder.Services
     .ValidateDataAnnotations();
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors();
 
-builder.Services.AddScoped<IRankingRepository, RankingRepository>();
-
-builder.Services.AddDbContext<FlappyDbContext>(
-    options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultDatabase")));
+builder.Services.AddDbContext<FlappyAlbyContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultDatabase")));
 
 var app = builder.Build();
+
+await app.MigrateContextAsync<FlappyAlbyContext>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

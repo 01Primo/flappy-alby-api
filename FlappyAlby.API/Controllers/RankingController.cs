@@ -1,49 +1,54 @@
 namespace FlappyAlby.API.Controllers;
 
-using Abstract;
+using Domain;
 using DTOs;
+using Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 [ApiController]
 [Route("[controller]")]
 public class RankingController : ControllerBase
 {
+    private readonly FlappyAlbyContext _context;
     private readonly ILogger<RankingController> _logger;
-    private readonly IRankingRepository _rankingRepository;
 
-    public RankingController(IRankingRepository rankingRepository, ILogger<RankingController> logger)
+    public RankingController(FlappyAlbyContext context, ILogger<RankingController> logger)
     {
-        _rankingRepository = rankingRepository;
+        _context = context;
         _logger = logger;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAsync()
-    {
-        try
-        {
-            var result = await _rankingRepository.GetTop10();
-            return Ok(result);
-        }
-        catch (Exception e)
-        {
-            return Problem(e.Message, statusCode: StatusCodes.Status500InternalServerError);
-        }
-    }
-
     [HttpPost]
-    public async Task<IActionResult> Post([FromBody] RankingDto ranking)
+    public async Task<IActionResult> Post([FromBody] ScoreDto scoreDto)
     {
         try
         {
-            _ = await _rankingRepository.Create(ranking);
-            var result = await _rankingRepository.GetTop10();
+            var player = _context.Players.SingleOrDefault(p => p.Name == scoreDto.PlayerName);
+            var id = player?.Id;
 
-            return Ok(result);
+            if (id is null)
+            {
+                var added = await _context.Players.AddAsync(new Player(scoreDto.Name.ToUpperInvariant()));
+                id ??= added.Entity.Id;
+            }
+            
+            var score = new Score(id!.Value, scoreDto.Total);
+            await _context.Ranking.AddAsync(score);
+            await _context.SaveChangesAsync();
+
+            var ranking = _context.Ranking
+                .Include(r => r.Player)
+                .OrderBy(s => s.Total)
+                .Take(5)
+                .Select(s => new ScoreDto(s.PlayerName, s.Total));
+
+            return Ok(ranking);
         }
         catch (Exception e)
         {
-            return Problem(e.Message, statusCode: StatusCodes.Status500InternalServerError);
+            _logger.LogCritical(e, e.Message);
+            return Problem(statusCode: StatusCodes.Status500InternalServerError);
         }
     }
 }
