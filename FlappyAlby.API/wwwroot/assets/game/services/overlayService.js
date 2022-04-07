@@ -15,6 +15,11 @@
         this.#player = player;
         this.#playerInput = playerInput;
         this.#button = button;
+
+        const selector = e => this.#button.disabled = this.#playerInput.value.length < 3
+        this.#playerInput.addEventListener('keydown', selector);
+        this.#playerInput.addEventListener('input', selector);
+        this.#playerInput.addEventListener('paste', selector);
     }
 
     static #timesBuilder(stopwatch) {
@@ -31,6 +36,10 @@
 
     startGame() {
         this.#overlay.style.display = 'none';
+    }
+    
+    disable() {
+        this.#button.disabled = true;
     }
 
     continue(stopwatch) {
@@ -78,6 +87,8 @@
         this.#title.innerHTML = 'You Win!';
         this.#button.innerHTML = 'End';
 
+        this.#button.disabled = true;
+        this.#playerInput.value = '';
         this.#score.innerHTML = OverlayService.#timesBuilder(stopwatch);
     }
     
@@ -86,7 +97,8 @@
         this.#player.style.display = 'none';
         this.#score.style.display = 'none';
         this.#button.style.display = 'inline-block';
-
+        this.#button.disabled = false;
+        
         this.#title.innerHTML = 'Congratulations!';
         this.#button.innerHTML = 'Play Again';
 

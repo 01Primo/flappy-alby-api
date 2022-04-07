@@ -35,6 +35,7 @@ export class Game {
     async nextLevel() {
         if (this.#gameOver)
         {
+            this.#overlayService.disable();
             this.#gameOver = false;
             const leaders = await this.#rankingClient.send(this.#overlayService.getName, this.#stopwatch.total);
             this.#overlayService.congratulations(leaders);
